@@ -92,7 +92,7 @@ One row per iteration. Columns: `ts`, `phase`, `decision`, `why`, `evidence`, `r
 
 This skill ships two commands in its `scripts/` directory: `init.py` and `score.py`. Run them from the target repo, passing the full path to the script, because the skill directory is not the working directory. The rule text below is authoritative if a script is unavailable.
 
-`init.py` writes the three state files and the resume prompt. It takes every `goal.md` field as a flag, plus `--dir` for the repo root and `--upgrade-block` to prepend the block to an existing prose goal without losing it. It refuses to run with any required value empty, `--floor-attempts` below 3, or `--lanes` outside 3 to 10, and writes nothing in that case. Run it once per repo, after the baseline is measured.
+`init.py` writes the three state files and the resume prompt. It takes `--metric`, `--direction`, `--baseline`, `--target`, `--floor-attempts`, `--gate`, `--evidence`, `--bar`, `--lanes`, and `--report-fail-keys`, matching the `goal.md` block one-for-one, plus `--dir` for the repo root, `--body` for the prose section, and `--upgrade-block` to prepend the block to an existing prose goal without losing it. It refuses to run with any required value empty, `--floor-attempts` below 3, or `--lanes` outside 3 to 10, and writes nothing in that case. Run it once per repo, after the baseline is measured.
 
 `score.py` takes `--dir`, `--tag` of `baseline` or `iteration`, `--note`, `--sha` to pin a measurement to a commit, `--timeout` in seconds, `--dry-run`, `--from-report`, `--record`, `--record-max-age` in minutes, and repeatable `--guard`. Use `--from-report` when the gate is slower than one tool call. Use `--record` only when the gate writes no JSON; it accepts `EARNED/TOTAL` or a bare value for a metric with a direction.
 
@@ -101,7 +101,6 @@ This skill ships two commands in its `scripts/` directory: `init.py` and `score.
 Every stop decision requires a complete `goal.md`: baseline, target, direction of `up` or `down`, a non-empty evidence list, a bar, a gate command, and `floor_attempts` of at least 3. A gate that passes against an incomplete goal still prints `STOP no` and the missing fields appear in the row's note.
 
 When a gate takes longer than one tool call, run the gate yourself and log the result from its artifacts. `--from-report <json>` reads `score` or `passed` or `value`, plus `total` or `possible` when present, and compares against the target using the goal's `direction`. It derives red guards from the report: any check whose `status` is not `pass`, a score below `threshold`, and every truthy key named in `report_fail_keys`. `--record` works without JSON but then you supply each failing `GUARD` line through `--guard`. Both reject evidence older than `--record-max-age` minutes, default 120, and both apply the floor.
-
 
 ## Phase 0. Contract
 
